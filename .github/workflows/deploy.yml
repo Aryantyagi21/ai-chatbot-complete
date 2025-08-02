@@ -1,9 +1,9 @@
-name: Deploy to EC2
+name: Deploy to EC2 (Placeholder)
 
 on:
   push:
     branches:
-      - master
+      - main  # Change to 'master' if that's your default branch
 
 jobs:
   deploy:
@@ -13,23 +13,21 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    # This block sets up the SSH key, but it failed due to encoding issues.
+    # If resuming later, ensure your private key is correctly base64-encoded when added to GitHub Secrets.
     - name: Set up SSH
       uses: webfactory/ssh-agent@v0.8.0
       with:
         ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
-    - name: Add EC2 host to known_hosts
-      run: |
-        mkdir -p ~/.ssh
-        ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
-
-    - name: Deploy on EC2
-      run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-          cd ~/ai-chatbot-complete/custom-api-chatbot
-          git pull origin main
-          docker stop chatbot-container || true
-          docker rm chatbot-container || true
-          docker build -t chatbot-api .
-          docker run -d -p 3000:3000 --name chatbot-container chatbot-api
-        EOF
+    # This is the deployment block — you can uncomment it once the SSH issue is resolved.
+    # - name: Deploy on EC2
+    #   run: |
+    #     ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+    #       cd ~/ai-chatbot-complete/custom-api-chatbot
+    #       git pull origin main
+    #       docker stop chatbot-container || true
+    #       docker rm chatbot-container || true
+    #       docker build -t chatbot-api .
+    #       docker run -d -p 3000:3000 --name chatbot-container chatbot-api
+    #     EOF

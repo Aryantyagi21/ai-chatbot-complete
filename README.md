@@ -1,3 +1,10 @@
+## 🚀 Project Summary
+
+- Developed a custom AI chatbot using Node.js and Express.
+- Containerized with Docker and deployed on AWS EC2.
+- Managed environment variables securely with `.env` and `keys.json`.
+- Placeholder GitHub Actions CI/CD pipeline included for automated deployment.
+
 # 🤖 AI FAQ Chatbot using OpenAI (ChatGPT API)
 
 A lightweight chatbot that responds to frequently asked questions using OpenAI's ChatGPT API. Built using Node.js and Express, with a simple HTML frontend — perfect for demos or integration into your website.
