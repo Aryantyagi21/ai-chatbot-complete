@@ -1,28 +1,41 @@
-name: Deploy Custom Chatbot API
+name: Deploy to EC2
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.8.0
       with:
-        node-version: '18'
+        ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
-    - name: Install dependencies
-      working-directory: custom-api-chatbot
-      run: npm install
+    - name: Deploy to EC2
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          cd ~/ai-chatbot-complete/custom-api-chatbot
 
-    - name: Archive Dockerfile
-      run: echo "Docker build can be added here if required"
+          echo "🟡 Pulling latest changes from GitHub..."
+          git fetch --all
+          git reset --hard origin/main
 
-    # - name: Deploy to EC2 (optional)
-    #   run: echo "You can SSH and deploy from here"
+          echo "🟠 Stopping and removing existing container if any..."
+          docker stop chatbot-container || true
+          docker rm chatbot-container || true
+
+          echo "🟢 Building Docker image..."
+          docker build -t chatbot-api .
+
+          echo "🔵 Running new container..."
+          docker run -d -p 3000:3000 --name chatbot-container chatbot-api
+
+          echo "✅ Deployment finished."
+        EOF
