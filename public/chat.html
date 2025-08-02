@@ -1,0 +1,47 @@
+<!-- public/chat.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SSB FAQ Chatbot</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    #chat-box { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; margin-bottom: 10px; }
+    .user { color: blue; }
+    .bot { color: green; }
+  </style>
+</head>
+<body>
+  <h2>SSB FAQ Chatbot</h2>
+  <div id="chat-box"></div>
+  <input type="text" id="message-input" placeholder="Ask something..." />
+  <button onclick="sendMessage()">Send</button>
+
+  <script>
+    async function sendMessage() {
+      const input = document.getElementById('message-input');
+      const message = input.value.trim();
+      if (!message) return;
+
+      const chatBox = document.getElementById('chat-box');
+      chatBox.innerHTML += `<div class="user"><strong>You:</strong> ${message}</div>`;
+
+      input.value = '';
+
+      try {
+        const res = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message })
+        });
+
+        const data = await res.json();
+        chatBox.innerHTML += `<div class="bot"><strong>Bot:</strong> ${data.reply}</div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+      } catch (err) {
+        chatBox.innerHTML += `<div class="bot">Error talking to server</div>`;
+      }
+    }
+  </script>
+</body>
+</html>
